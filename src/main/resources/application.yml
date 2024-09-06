@@ -1,0 +1,57 @@
+spring:
+  application:
+    name: auth-server
+  datasource:
+    url: jdbc:oracle:thin:@//localhost:1521/xepdb1
+    username: authserver
+    password: auth
+    driver-class-name: oracle.jdbc.OracleDriver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.OracleDialect
+    show-sql: true
+  flyway:
+    baseline-version: 12
+    baseline-on-migrate: true
+    enabled: false
+    locations: classpath:db/migration  # Ensure migration files are in the correct folder
+jwt:
+  access-token-validity: 15  # Access token expiration in minutes (15 minutes)
+  refresh-token-validity: 60  # Refresh token expiration in minutes (1 hour)
+  issuer: "authserver"  # Issuer of the JWT
+  audience: "mymicroservices"  # The intended audience of the JWT
+logging:
+  level:
+    root: INFO
+    org.springframework.web: INFO
+    org.hibernate.SQL: INFO
+server:
+  port: 8080
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  endpoint:
+    health:
+      show-details: always
+cors:
+  allowed-origins: "*"
+  allowed-methods: "*"
+  allowed-headers: "*"
+  allow-credentials: true
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+
+key:
+  rotation:
+    cron: "0 0 3 * * *"  # Schedule to rotate keys at 3 AM every day
+    #cron: "0 * * * * *"  # Every minute
+  cleanup:
+    cron: "0 0 * * * *"  # Cron expression for key cleanup (every hour)
