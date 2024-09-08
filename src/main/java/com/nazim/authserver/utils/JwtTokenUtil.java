@@ -71,11 +71,11 @@ public class JwtTokenUtil {
                 .compact();
     }
 
-    // Validate JWT token using the provided signing key resolver
+    // JwtTokenUtil.java
     public boolean validateToken(String token, SigningKeyResolver signingKeyResolver) {
         try {
             Jwts.parserBuilder()
-                    .setSigningKeyResolver(signingKeyResolver)  // Use the custom key resolver
+                    .setSigningKeyResolver(signingKeyResolver)
                     .build()
                     .parseClaimsJws(token);  // Validate the token
             return true;
@@ -85,6 +85,7 @@ public class JwtTokenUtil {
             return false;
         }
     }
+
 
     // Extract user details from JWT token
     public User getUserFromToken(String token, SigningKeyResolver signingKeyResolver) {

@@ -62,12 +62,16 @@ public class AuthService {
         userRepository.save(user);
     }
 
-    // Refresh token method
+    // Refresh token method in authService
     public String refreshToken(String token) {
-        if (jwtTokenUtil.validateToken(token, jwtSigningKeyResolver)) {  // Pass the signing key resolver
-            if (!jwtTokenUtil.isTokenExpired(token, jwtSigningKeyResolver)) {  // Pass the signing key resolver
-                User user = jwtTokenUtil.getUserFromToken(token, jwtSigningKeyResolver);  // Pass the signing key resolver
-                return jwtTokenUtil.generateRefreshToken(user);  // Generate new token
+        // Validate the JWT token using the signing key resolver
+        if (jwtTokenUtil.validateToken(token, jwtSigningKeyResolver)) {
+            // Check if the token has expired
+            if (!jwtTokenUtil.isTokenExpired(token, jwtSigningKeyResolver)) {
+                // Extract the user details from the token
+                User user = jwtTokenUtil.getUserFromToken(token, jwtSigningKeyResolver);
+                // Generate and return a new refresh token
+                return jwtTokenUtil.generateRefreshToken(user);
             } else {
                 throw new RuntimeException("Token has expired");
             }
@@ -75,6 +79,7 @@ public class AuthService {
             throw new RuntimeException("Invalid token");
         }
     }
+
 
     // Standalone token validation method
     public boolean validateToken(String token) {

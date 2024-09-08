@@ -25,7 +25,8 @@ public class JWKSController {
 
     @GetMapping
     public Map<String, Object> getJWKS() {
-        RSAKey activeKey = rsaKeyRepository.findByActiveTrue().orElseThrow(() -> new RuntimeException("No active RSA key found"));
+        RSAKey activeKey = rsaKeyRepository.findByActiveTrue()
+                .orElseThrow(() -> new RuntimeException("No active RSA key found"));
 
         // Decode public key
         try {
@@ -40,8 +41,8 @@ public class JWKSController {
             jwk.put("use", "sig");  // Public key use, 'sig' for signature
             jwk.put("alg", "RS256");  // Algorithm
             jwk.put("kid", activeKey.getKeyId());  // Key ID
-            jwk.put("n", Base64.getUrlEncoder().encodeToString(rsaPublicKey.getModulus().toByteArray()));  // Modulus
-            jwk.put("e", Base64.getUrlEncoder().encodeToString(rsaPublicKey.getPublicExponent().toByteArray()));  // Exponent
+            jwk.put("n", Base64.getUrlEncoder().withoutPadding().encodeToString(rsaPublicKey.getModulus().toByteArray()));  // Modulus
+            jwk.put("e", Base64.getUrlEncoder().withoutPadding().encodeToString(rsaPublicKey.getPublicExponent().toByteArray()));  // Exponent
 
             Map<String, Object> jwks = new HashMap<>();
             jwks.put("keys", new Map[] { jwk });

@@ -26,8 +26,8 @@ jwt:
 logging:
   level:
     root: INFO
-    org.springframework.web: INFO
-    org.hibernate.SQL: INFO
+    org.springframework.web: DEBUG
+    org.hibernate.SQL: DEBUG
 server:
   port: 8080
 management:

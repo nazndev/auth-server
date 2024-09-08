@@ -25,8 +25,8 @@ public class JwtSigningKeyResolver implements SigningKeyResolver {
     @Override
     public PublicKey resolveSigningKey(JwsHeader header, Claims claims) {
         String kid = header.getKeyId();  // Extract key ID (kid) from JWT header
-        RSAKey rsaKey = rsaKeyRepository.findById(Long.parseLong(kid))
-                .orElseThrow(() -> new RuntimeException("RSA Key not found for id: " + kid));
+        RSAKey rsaKey = rsaKeyRepository.findByKeyId(kid)  // Use findByKeyId instead of findById
+                .orElseThrow(() -> new RuntimeException("RSA Key not found for keyId: " + kid));
 
         return jwtTokenUtil.getPublicKey(rsaKey.getPublicKey());
     }

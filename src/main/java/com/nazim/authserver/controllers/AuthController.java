@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -34,18 +35,25 @@ public class AuthController {
         }
     }
 
-    // Change Password API
     @PostMapping("/change-password")
-    public ResponseEntity<ApiResponse<String>> changePassword(
-            @AuthenticationPrincipal Authentication authentication,
-            @RequestBody ChangePasswordRequest request) {
+    public ResponseEntity<ApiResponse<String>> changePassword(@RequestBody ChangePasswordRequest request) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new ApiResponse<>("failure", "Authentication is missing", null));
+        }
+
         try {
-            authService.changePassword(authentication.getName(), request.getOldPassword(), request.getNewPassword(), request.getConfirmPassword());
+            String username = authentication.getName();
+            authService.changePassword(username, request.getOldPassword(), request.getNewPassword(), request.getConfirmPassword());
             return ResponseEntity.ok(new ApiResponse<>("success", "Password changed successfully", null));
         } catch (Exception ex) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ApiResponse<>("failure", "Failed to change password: " + ex.getMessage(), null));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ApiResponse<>("failure", "Failed to change password: " + ex.getMessage(), null));
         }
     }
+
 
     // Token validation API
     @GetMapping("/validate-token")
@@ -72,11 +80,18 @@ public class AuthController {
                 throw new IllegalArgumentException("Invalid grant_type");
             }
 
+            // Refresh the token using authService
             String newToken = authService.refreshToken(refreshToken);
+
             return ResponseEntity.ok(new ApiResponse<>("success", "Token refreshed", newToken));
         } catch (Exception ex) {
+            // Log the exception for better debugging
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(new ApiResponse<>("failure", "Token refresh failed: " + ex.getMessage(), null));
         }
     }
+
+
+
+
 }
